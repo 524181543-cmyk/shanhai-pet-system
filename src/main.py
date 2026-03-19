@@ -236,6 +236,14 @@ class GraphService:
 service = GraphService()
 app = FastAPI()
 
+# 导入并注册宠物系统路由
+try:
+    from server.pet_app import create_pet_routes
+    create_pet_routes(app)
+    logger.info("宠物系统路由已注册")
+except Exception as e:
+    logger.error(f"注册宠物系统路由失败: {str(e)}")
+
 # OpenAI 兼容接口处理器
 openai_handler = OpenAIChatHandler(service)
 
