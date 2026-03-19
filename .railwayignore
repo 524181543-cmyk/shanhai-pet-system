@@ -1,0 +1,19 @@
+# Railway部署忽略文件
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.env
+.git/
+.gitignore
+*.md
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+.DS_Store
+*.log
+logs/

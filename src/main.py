@@ -492,7 +492,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Start FastAPI server")
     parser.add_argument("-m", type=str, default="http", help="Run mode, support http,flow,node")
     parser.add_argument("-n", type=str, default="", help="Node ID for single node run")
-    parser.add_argument("-p", type=int, default=5000, help="HTTP server port")
+    parser.add_argument("-p", type=int, default=int(os.getenv("PORT", "5000")), help="HTTP server port")
     parser.add_argument("-i", type=str, default="", help="Input JSON string for flow/node mode")
     return parser.parse_args()
 
