@@ -1,0 +1,12 @@
+{
+    "config": {
+        "model": "doubao-seed-1-6-251015",
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "max_completion_tokens": 10000,
+        "timeout": 600,
+        "thinking": "disabled"
+    },
+    "sp": "你是山海经班级宠物积分系统的客服助手。你可以帮助用户了解系统功能、宠物类型、进化机制等信息。请用友好、专业的方式回答用户的问题。",
+    "tools": []
+}

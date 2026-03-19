@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>山海经班级宠物积分系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 头部样式 */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+
+        /* 用户信息区域 */
+        .user-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .user-details {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .user-details h2 {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .user-stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 宠物展示区域 */
+        .pet-display {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .pet-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pet-image-wrapper {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .pet-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .pet-placeholder {
+            font-size: 5em;
+            color: #ccc;
+        }
+
+        .pet-info {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .pet-name {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .pet-stage {
+            display: inline-block;
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+
+        .pet-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .progress-section {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            margin-top: 5px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        /* 技能展示 */
+        .skills-section {
+            margin-top: 20px;
+        }
+
+        .skills-title {
+            font-size: 1.2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .skill-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .skill-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .skill-type {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 宠物选择区域 */
+        .pet-selection {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .pet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .pet-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .pet-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .pet-card-image {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 4em;
+            color: #ccc;
+            overflow: hidden;
+        }
+
+        .pet-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pet-card-name {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .pet-card-element {
+            display: inline-block;
+            padding: 3px 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .pet-card-rarity {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            margin-bottom: 10px;
+        }
+
+        .rarity-common {
+            background: #b0bec5;
+            color: white;
+        }
+
+        .rarity-rare {
+            background: #42a5f5;
+            color: white;
+        }
+
+        .rarity-epic {
+            background: #ab47bc;
+            color: white;
+        }
+
+        .rarity-legendary {
+            background: linear-gradient(135deg, #ffd700 0%, #ff6b6b 100%);
+            color: white;
+        }
+
+        .pet-card-description {
+            color: #666;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        /* 积分操作区域 */
+        .points-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .points-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* 排行榜 */
+        .leaderboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background-color 0.3s;
+        }
+
+        .leaderboard-item:hover {
+            background-color: #f5f7fa;
+        }
+
+        .leaderboard-item:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-rank {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .leaderboard-rank.gold {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+        }
+
+        .leaderboard-rank.silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+        }
+
+        .leaderboard-rank.bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #b8860b 100%);
+        }
+
+        .leaderboard-user {
+            flex: 1;
+        }
+
+        .leaderboard-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .leaderboard-points {
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* 登录/注册表单 */
+        .auth-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .auth-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 20px;
+        }
+
+        .auth-form .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .user-stats {
+                gap: 20px;
+            }
+
+            .pet-container {
+                flex-direction: column;
+            }
+
+            .pet-image-wrapper {
+                width: 250px;
+                height: 250px;
+            }
+
+            .points-form {
+                flex-direction: column;
+            }
+
+            .form-group {
+                min-width: 100%;
+            }
+        }
+
+        /* 动画效果 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 通知消息 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            border-left: 4px solid #4caf50;
+        }
+
+        .notification.error {
+            border-left: 4px solid #f44336;
+        }
+
+        /* 进化阶段展示 */
+        .stages-evolution {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .stage-item {
+            text-align: center;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .stage-item.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .stage-item.unlocked {
+            opacity: 0.8;
+        }
+
+        .stage-item.locked {
+            opacity: 0.3;
+        }
+
+        .stage-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            font-size: 2em;
+            overflow: hidden;
+        }
+
+        .stage-item.active .stage-icon {
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .stage-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .stage-points {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .arrow-icon {
+            font-size: 1.5em;
+            color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 头部 -->
+        <div class="header fade-in">
+            <h1>🐉 山海经班级宠物积分系统</h1>
+            <p>领养你的专属神兽，通过积分解锁进化形态，体验山海经的神奇世界！</p>
+        </div>
+
+        <!-- 登录/注册区域 -->
+        <div id="auth-section" class="auth-section fade-in">
+            <div class="auth-form">
+                <h2><i class="fas fa-user-circle"></i> 用户中心</h2>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="username" placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="email" placeholder="请输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label>显示名称</label>
+                    <input type="text" id="display_name" placeholder="请输入显示名称">
+                </div>
+                <button class="btn" onclick="registerUser()">
+                    <i class="fas fa-sign-in-alt"></i> 注册/登录
+                </button>
+            </div>
+        </div>
+
+        <!-- 用户信息区域 -->
+        <div id="user-section" class="user-section fade-in" style="display: none;">
+            <div class="user-info">
+                <div class="user-details">
+                    <h2 id="user-display-name">欢迎，冒险者</h2>
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="user-total-points">0</div>
+                            <div class="stat-label">总积分</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="user-pet-stage">-</div>
+                            <div class="stat-label">宠物阶段</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> 退出
+                </button>
+            </div>
+        </div>
+
+        <!-- 宠物展示区域 -->
+        <div id="pet-display" class="pet-display fade-in" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-dragon"></i> 我的神兽</h2>
+            <div class="pet-container">
+                <div class="pet-image-wrapper">
+                    <img id="pet-image" class="pet-image" src="" alt="宠物形象" style="display: none;">
+                    <div id="pet-placeholder" class="pet-placeholder">
+                        <i class="fas fa-egg"></i>
+                    </div>
+                </div>
+                <div class="pet-info">
+                    <div class="pet-name" id="pet-name">未领养</div>
+                    <div class="pet-stage" id="pet-stage">初始形态</div>
+                    <div class="pet-description" id="pet-description">
+                        快去选择一只山海经神兽，开始你的冒险之旅吧！
+                    </div>
+                    
+                    <div class="progress-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="font-weight: bold;">进化进度</span>
+                            <span id="progress-text" style="color: #667eea;">0 / 100</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+                        </div>
+                        <div class="progress-text" id="next-stage-text">距离下一阶段还需 100 积分</div>
+                    </div>
+
+                    <!-- 技能展示 -->
+                    <div class="skills-section" id="skills-section" style="display: none;">
+                        <div class="skills-title"><i class="fas fa-magic"></i> 已解锁技能</div>
+                        <div class="skills-grid" id="skills-grid">
+                            <!-- 技能卡片将动态生成 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 进化阶段展示 -->
+            <div class="stages-evolution" id="stages-evolution">
+                <!-- 进化阶段将动态生成 -->
+            </div>
+        </div>
+
+        <!-- 宠物选择区域 -->
+        <div id="pet-selection" class="pet-selection fade-in" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-hand-holding-heart"></i> 选择你的神兽</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                每位冒险者只能选择一只山海经神兽作为伙伴，请慎重选择！
+            </p>
+            <div class="pet-grid" id="pet-grid">
+                <!-- 宠物卡片将动态生成 -->
+            </div>
+        </div>
+
+        <!-- 积分操作区域 -->
+        <div id="points-section" class="points-section fade-in" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-star"></i> 积分操作</h2>
+            <div class="points-form">
+                <div class="form-group">
+                    <label>积分值</label>
+                    <input type="number" id="points-value" placeholder="输入积分值" value="10">
+                </div>
+                <div class="form-group">
+                    <label>积分类别</label>
+                    <select id="points-category">
+                        <option value="作业">作业</option>
+                        <option value="表现">表现</option>
+                        <option value="奖励">奖励</option>
+                        <option value="其他">其他</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label>积分原因</label>
+                    <input type="text" id="points-reason" placeholder="描述积分原因">
+                </div>
+                <button class="btn" onclick="addPoints()">
+                    <i class="fas fa-plus-circle"></i> 添加积分
+                </button>
+            </div>
+        </div>
+
+        <!-- 排行榜 -->
+        <div id="leaderboard-section" class="leaderboard fade-in" style="display: none;">
+            <h2 class="section-title"><i class="fas fa-trophy"></i> 积分排行榜</h2>
+            <ul class="leaderboard-list" id="leaderboard-list">
+                <!-- 排行榜项目将动态生成 -->
+            </ul>
+        </div>
+    </div>
+
+    <!-- 通知消息 -->
+    <div id="notification" class="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <script>
+        // API基础URL
+        const API_BASE = window.location.origin;
+
+        // 当前用户信息
+        let currentUser = null;
+        let currentPet = null;
+
+        // 显示通知
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notification.className = 'notification ' + type;
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 用户注册/登录
+        async function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const displayName = document.getElementById('display_name').value.trim();
+
+            if (!username || !email || !displayName) {
+                showNotification('请填写完整信息', 'error');
+                return;
+            }
+
+            try {
+                // 先尝试创建用户
+                const response = await fetch(`${API_BASE}/api/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        display_name: displayName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentUser = data.data;
+                    localStorage.setItem('userId', currentUser.id);
+                    localStorage.setItem('username', currentUser.username);
+                    showNotification('注册成功！欢迎加入山海经世界！', 'success');
+                    loadUserDashboard();
+                } else {
+                    // 如果用户已存在，尝试登录
+                    if (data.error === '用户名已存在') {
+                        // 这里简化处理，实际应该有专门的登录API
+                        showNotification('用户名已存在，请更换用户名', 'error');
+                    } else {
+                        showNotification(data.error || '注册失败', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showNotification('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        // 加载用户仪表板
+        async function loadUserDashboard() {
+            if (!currentUser) {
+                const userId = localStorage.getItem('userId');
+                if (userId) {
+                    try {
+                        const response = await fetch(`${API_BASE}/api/users/${userId}`);
+                        const data = await response.json();
+                        if (data.success) {
+                            currentUser = data.data;
+                        }
+                    } catch (error) {
+                        console.error('Error loading user:', error);
+                    }
+                }
+            }
+
+            if (!currentUser) {
+                document.getElementById('auth-section').style.display = 'block';
+                document.getElementById('user-section').style.display = 'none';
+                document.getElementById('pet-display').style.display = 'none';
+                document.getElementById('pet-selection').style.display = 'none';
+                document.getElementById('points-section').style.display = 'none';
+                document.getElementById('leaderboard-section').style.display = 'none';
+                return;
+            }
+
+            // 显示用户信息
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('user-section').style.display = 'block';
+            document.getElementById('user-display-name').textContent = `欢迎，${currentUser.display_name}`;
+            document.getElementById('user-total-points').textContent = currentUser.total_points;
+
+            // 加载用户宠物
+            await loadUserPet();
+
+            // 加载宠物类型（如果没有宠物）
+            if (!currentPet) {
+                await loadPetTypes();
+            }
+
+            // 加载排行榜
+            await loadLeaderboard();
+        }
+
+        // 加载用户宠物
+        async function loadUserPet() {
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${currentUser.id}/pets`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    currentPet = data.data[0];
+                    displayPet();
+                    document.getElementById('pet-selection').style.display = 'none';
+                    document.getElementById('points-section').style.display = 'block';
+                } else {
+                    document.getElementById('pet-display').style.display = 'none';
+                    document.getElementById('pet-selection').style.display = 'block';
+                    document.getElementById('points-section').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading pet:', error);
+            }
+        }
+
+        // 显示宠物
+        async function displayPet() {
+            if (!currentPet) return;
+
+            document.getElementById('pet-display').style.display = 'block';
+
+            // 获取宠物详情
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${currentUser.id}/pets/${currentPet.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const petData = data.data;
+                    const pet = petData.pet;
+                    const stageInfo = petData.current_stage_info;
+                    const skills = petData.unlocked_skills;
+
+                    // 更新宠物信息
+                    document.getElementById('pet-name').textContent = pet.nickname || pet.pet_types.name;
+                    document.getElementById('pet-stage').textContent = stageInfo ? stageInfo.stage_name : '初始形态';
+                    document.getElementById('pet-description').textContent = stageInfo ? stageInfo.description : pet.pet_types.description;
+
+                    // 显示宠物图片
+                    if (stageInfo && stageInfo.image_url) {
+                        document.getElementById('pet-image').src = stageInfo.image_url;
+                        document.getElementById('pet-image').style.display = 'block';
+                        document.getElementById('pet-placeholder').style.display = 'none';
+                    } else {
+                        document.getElementById('pet-image').style.display = 'none';
+                        document.getElementById('pet-placeholder').style.display = 'flex';
+                        document.getElementById('pet-placeholder').innerHTML = '<i class="fas fa-dragon"></i>';
+                    }
+
+                    // 更新进度
+                    updateProgress(pet);
+
+                    // 更新用户状态
+                    document.getElementById('user-pet-stage').textContent = `Lv.${pet.current_stage}`;
+
+                    // 显示技能
+                    displaySkills(skills);
+
+                    // 显示进化阶段
+                    await displayEvolutionStages(pet.pet_type_id, pet.current_stage, pet.unlocked_stages);
+                }
+            } catch (error) {
+                console.error('Error displaying pet:', error);
+            }
+        }
+
+        // 更新进度
+        function updateProgress(pet) {
+            // 获取下一阶段所需积分
+            fetch(`${API_BASE}/api/pets/types/${pet.pet_type_id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const stages = data.data.stages;
+                        const currentStage = pet.current_stage;
+                        const nextStage = stages.find(s => s.stage_level === currentStage + 1);
+                        
+                        if (nextStage) {
+                            const currentPoints = pet.total_points;
+                            const requiredPoints = nextStage.required_points;
+                            const progress = Math.min((currentPoints / requiredPoints) * 100, 100);
+                            
+                            document.getElementById('progress-fill').style.width = `${progress}%`;
+                            document.getElementById('progress-text').textContent = `${currentPoints} / ${requiredPoints}`;
+                            document.getElementById('next-stage-text').textContent = 
+                                currentPoints >= requiredPoints ? '可以进化！' : `距离下一阶段还需 ${requiredPoints - currentPoints} 积分`;
+                        } else {
+                            document.getElementById('progress-fill').style.width = '100%';
+                            document.getElementById('progress-text').textContent = '已达到最高阶段';
+                            document.getElementById('next-stage-text').textContent = '恭喜！你的神兽已进化到最终形态！';
+                        }
+                    }
+                });
+        }
+
+        // 显示技能
+        function displaySkills(skills) {
+            const skillsSection = document.getElementById('skills-section');
+            const skillsGrid = document.getElementById('skills-grid');
+            
+            if (!skills || skills.length === 0) {
+                skillsSection.style.display = 'none';
+                return;
+            }
+
+            skillsSection.style.display = 'block';
+            skillsGrid.innerHTML = '';
+
+            skills.forEach(skill => {
+                const skillCard = document.createElement('div');
+                skillCard.className = 'skill-card';
+                skillCard.innerHTML = `
+                    <div class="skill-icon">
+                        <i class="fas fa-${getSkillIcon(skill.skill_type)}"></i>
+                    </div>
+                    <div class="skill-name">${skill.skill_name}</div>
+                    <div class="skill-type">${skill.skill_type}</div>
+                `;
+                skillsGrid.appendChild(skillCard);
+            });
+        }
+
+        // 获取技能图标
+        function getSkillIcon(skillType) {
+            const icons = {
+                '特效': 'sparkles',
+                '被动': 'shield-alt',
+                '主动': 'bolt'
+            };
+            return icons[skillType] || 'magic';
+        }
+
+        // 显示进化阶段
+        async function displayEvolutionStages(petTypeId, currentStage, unlockedStages) {
+            try {
+                const response = await fetch(`${API_BASE}/api/pets/types/${petTypeId}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const stages = data.data.stages;
+                    const container = document.getElementById('stages-evolution');
+                    container.innerHTML = '';
+
+                    stages.forEach((stage, index) => {
+                        const stageItem = document.createElement('div');
+                        stageItem.className = 'stage-item';
+                        
+                        if (stage.stage_level === currentStage) {
+                            stageItem.classList.add('active');
+                        } else if (unlockedStages[stage.stage_level]) {
+                            stageItem.classList.add('unlocked');
+                        } else {
+                            stageItem.classList.add('locked');
+                        }
+
+                        stageItem.innerHTML = `
+                            <div class="stage-icon">
+                                <i class="fas fa-${getStageIcon(stage.stage_level)}"></i>
+                            </div>
+                            <div class="stage-name">${stage.stage_name}</div>
+                            <div class="stage-points">${stage.required_points} 积分</div>
+                        `;
+
+                        container.appendChild(stageItem);
+
+                        // 添加箭头（除了最后一个）
+                        if (index < stages.length - 1) {
+                            const arrow = document.createElement('div');
+                            arrow.className = 'arrow-icon';
+                            arrow.innerHTML = '<i class="fas fa-arrow-right"></i>';
+                            container.appendChild(arrow);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error displaying stages:', error);
+            }
+        }
+
+        // 获取阶段图标
+        function getStageIcon(stageLevel) {
+            const icons = {
+                1: 'egg',
+                2: 'kiwi-bird',
+                3: 'feather-alt',
+                4: 'dragon'
+            };
+            return icons[stageLevel] || 'star';
+        }
+
+        // 加载宠物类型
+        async function loadPetTypes() {
+            try {
+                const response = await fetch(`${API_BASE}/api/pets/types`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const petGrid = document.getElementById('pet-grid');
+                    petGrid.innerHTML = '';
+
+                    data.data.forEach(petType => {
+                        const petCard = document.createElement('div');
+                        petCard.className = 'pet-card';
+                        petCard.onclick = () => selectPet(petType.id);
+                        
+                        petCard.innerHTML = `
+                            <div class="pet-card-image">
+                                <i class="fas fa-${getPetIcon(petType.name)}"></i>
+                            </div>
+                            <div class="pet-card-name">${petType.name}</div>
+                            <div>
+                                <span class="pet-card-element">${petType.element}</span>
+                                <span class="pet-card-rarity rarity-${petType.rarity === '传说' ? 'legendary' : petType.rarity === '史诗' ? 'epic' : petType.rarity === '稀有' ? 'rare' : 'common'}">${petType.rarity}</span>
+                            </div>
+                            <div class="pet-card-description">${petType.description}</div>
+                        `;
+
+                        petGrid.appendChild(petCard);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading pet types:', error);
+            }
+        }
+
+        // 获取宠物图标（根据名称）
+        function getPetIcon(petName) {
+            // 这里可以根据宠物名称返回不同的图标
+            // 实际项目中应该使用生成的图片
+            return 'dragon';
+        }
+
+        // 选择宠物
+        async function selectPet(petTypeId) {
+            if (!currentUser) {
+                showNotification('请先登录', 'error');
+                return;
+            }
+
+            if (!confirm('确定要选择这只神兽吗？选择后将无法更改！')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${currentUser.id}/pets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pet_type_id: petTypeId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('恭喜！你成功领养了一只神兽！', 'success');
+                    await loadUserPet();
+                } else {
+                    showNotification(data.error || '领养失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error selecting pet:', error);
+                showNotification('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        // 添加积分
+        async function addPoints() {
+            if (!currentUser || !currentPet) {
+                showNotification('请先登录并领养宠物', 'error');
+                return;
+            }
+
+            const points = parseInt(document.getElementById('points-value').value);
+            const category = document.getElementById('points-category').value;
+            const reason = document.getElementById('points-reason').value.trim();
+
+            if (!points || !reason) {
+                showNotification('请填写完整信息', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/api/users/${currentUser.id}/points`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        points: points,
+                        category: category,
+                        reason: reason,
+                        user_pet_id: currentPet.id
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification(`成功添加 ${points} 积分！`, 'success');
+                    document.getElementById('points-reason').value = '';
+                    
+                    // 重新加载用户信息和宠物信息
+                    await loadUserDashboard();
+                } else {
+                    showNotification(data.error || '添加积分失败', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding points:', error);
+                showNotification('网络错误，请稍后重试', 'error');
+            }
+        }
+
+        // 加载排行榜
+        async function loadLeaderboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/leaderboard?limit=10`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const leaderboardList = document.getElementById('leaderboard-list');
+                    leaderboardList.innerHTML = '';
+
+                    document.getElementById('leaderboard-section').style.display = 'block';
+
+                    data.data.forEach((user, index) => {
+                        const rank = index + 1;
+                        let rankClass = '';
+                        
+                        if (rank === 1) rankClass = 'gold';
+                        else if (rank === 2) rankClass = 'silver';
+                        else if (rank === 3) rankClass = 'bronze';
+
+                        const item = document.createElement('li');
+                        item.className = 'leaderboard-item';
+                        item.innerHTML = `
+                            <div class="leaderboard-rank ${rankClass}">${rank}</div>
+                            <div class="leaderboard-user">
+                                <div class="leaderboard-name">${user.display_name}</div>
+                            </div>
+                            <div class="leaderboard-points">${user.total_points} 积分</div>
+                        `;
+
+                        leaderboardList.appendChild(item);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading leaderboard:', error);
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            localStorage.removeItem('userId');
+            localStorage.removeItem('username');
+            currentUser = null;
+            currentPet = null;
+            loadUserDashboard();
+            showNotification('已退出登录', 'success');
+        }
+
+        // 页面加载时初始化
+        window.addEventListener('load', () => {
+            loadUserDashboard();
+        });
+    </script>
+</body>
+</html>
