@@ -357,5 +357,19 @@ def health_check():
     return jsonify({'status': 'ok', 'message': '山海经班级宠物积分系统运行正常'}), 200
 
 
+# ========== 前端页面 ==========
+
+@app.route('/', methods=['GET'])
+def index():
+    """返回前端页面"""
+    try:
+        frontend_path = os.path.join(project_root, 'src', 'frontend', 'index.html')
+        with open(frontend_path, 'r', encoding='utf-8') as f:
+            return f.read(), 200, {'Content-Type': 'text/html; charset=utf-8'}
+    except Exception as e:
+        logger.error(f"读取前端页面失败: {str(e)}")
+        return jsonify({'error': '页面不存在'}), 404
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
