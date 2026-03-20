@@ -29,10 +29,14 @@ app = FastAPI(
 # ========== 健康检查端点（Railway 使用）==========
 
 @app.get("/health")
-@app.get("/")
 async def health():
-    """健康检查 - 必须最快响应"""
+    """健康检查 - Railway 使用此端点检查服务状态"""
     return {"status": "ok", "service": "山海经班级宠物积分系统"}
+
+@app.get("/")
+async def index():
+    """首页 - 返回HTML页面"""
+    return HTMLResponse(content=INDEX_HTML, status_code=200)
 
 # ========== 模拟数据存储 ==========
 mock_db = {
@@ -519,11 +523,6 @@ INDEX_HTML = """
 """
 
 # ========== 首页 ==========
-
-@app.get("/app")
-async def index():
-    """主页面"""
-    return HTMLResponse(content=INDEX_HTML, status_code=200)
 
 # ========== 用户API ==========
 
