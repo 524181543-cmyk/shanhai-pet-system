@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ['python312', 'gcc', 'libpq']
+nixPkgs = ['python312']
 
 [phases.install]
-cmds = ['pip install --no-cache-dir -r requirements-railway.txt']
+cmds = ['pip install --no-cache-dir fastapi uvicorn supabase httpx python-dotenv rich']
 
 [start]
 cmd = 'python src/main.py -m http -p ${PORT:-8000}'
