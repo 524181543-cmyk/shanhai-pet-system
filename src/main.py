@@ -4,7 +4,6 @@ import json
 import threading
 import traceback
 import logging
-import os
 from typing import Any, Dict, Iterable, AsyncIterable, AsyncGenerator, Optional
 import cozeloop
 import uvicorn
