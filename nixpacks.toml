@@ -2,7 +2,7 @@
 nixPkgs = ['python312']
 
 [phases.install]
-cmds = ['pip install --no-cache-dir fastapi uvicorn supabase httpx python-dotenv rich']
+cmds = ['pip install --no-cache-dir -r requirements.txt']
 
 [start]
-cmd = 'python src/main.py -m http -p ${PORT:-8000}'
+cmd = 'python app.py'
