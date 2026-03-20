@@ -9,7 +9,7 @@ import random
 from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
 from pydantic import BaseModel
 import uvicorn
 
@@ -27,20 +27,40 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="山海经班级宠物积分系统",
     description="基于山海经主题的班级宠物积分系统",
-    version="2.0.0"
+    version="2.0.0",
+    docs_url=None,
+    redoc_url=None
 )
 
-# 初始化Supabase客户端
-try:
-    from storage.database.supabase_client import get_supabase_client
-    db = get_supabase_client()
-    logger.info("✅ 数据库连接成功")
-except Exception as e:
-    logger.warning(f"⚠️ 数据库连接失败: {str(e)}")
-    logger.info("使用模拟数据模式...")
-    db = None
+# ========== 健康检查端点（必须放在最前面）==========
 
-# ========== 模拟数据存储 ==========
+@app.get("/health")
+async def health():
+    """健康检查 - Railway 使用此端点检查服务状态"""
+    return {"status": "ok", "service": "山海经班级宠物积分系统", "version": "2.0.0"}
+
+@app.get("/")
+async def root():
+    """根路径重定向到主页面"""
+    return HTMLResponse(content=INDEX_HTML, status_code=200)
+
+# 数据库连接（延迟初始化）
+_db = None
+
+def get_db():
+    """获取数据库连接（延迟初始化）"""
+    global _db
+    if _db is None:
+        try:
+            from storage.database.supabase_client import get_supabase_client
+            _db = get_supabase_client()
+            logger.info("✅ 数据库连接成功")
+        except Exception as e:
+            logger.warning(f"⚠️ 数据库连接失败: {str(e)}")
+            logger.info("使用模拟数据模式...")
+    return _db
+
+# 模拟数据存储
 mock_db = {
     'users': {},
     'user_pets': {},
@@ -68,25 +88,27 @@ class PointAdd(BaseModel):
 
 class FeedPet(BaseModel):
     food_points: int  # 消耗的积分数值
-
-# ========== 前端页面 ==========
-
-INDEX_HTML = """
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>山海经班级宠物积分系统</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            padding: 20px;
-            overflow-x: hidden;
-                        margin: 20px 0;
+        .user-info {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        .user-info h3 {
+            color: #2d3436;
+            margin-bottom: 12px;
+            font-size: 1.5em;
+        }
+        .user-info p {
+            color: #636e72;
+            margin: 8px 0;
+            font-size: 1em;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
         }
         .stat-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -153,98 +175,90 @@ INDEX_HTML = """
         .message.info {
             background: #d1ecf1;
             color: #0c5460;
+        .user-info {
+            background: linear-gradient(135deg, #dfe6e9 0%, #b2bec3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
         }
-        
-        /* 神兽描述 */
-        .beast-description {
-            background: rgba(0,0,0,0.05);
-            border-left: 4px solid #667eea;
-            padding: 15px 20px;
-            margin: 15px 0;
-            border-radius: 0 10px 10px 0;
-            font-style: italic;
+        .user-info h3 {
+            color: #2d3436;
+            margin-bottom: 12px;
+            font-size: 1.5em;
+        }
+        .user-info p {
             color: #636e72;
+            margin: 8px 0;
+            font-size: 1em;
         }
-        
-        /* 喂养动画 */
-        @keyframes feed-animation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
         }
-        .feeding {
-            animation: feed-animation 0.5s ease;
-                       if (currentUser.total_points < points) {
-                alert('积分不足！当前积分：' + currentUser.total_points);
-                return;
-            }
-            
-            try {
-                // 扣除积分
-                const res = await fetch(API_BASE + `/api/users/${currentUser.id}/points`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        points: -points,
-                        reason: '喂养' + currentPet.nickname,
-                        category: '喂养',
-                        user_pet_id: currentPet.id
-                    })
-                });
-                
-                const data = await res.json();
-                
-                if (data.success) {
-                    // 更新饱食度
-                    currentPet.hunger = Math.min(100, currentPet.hunger + points);
-                    currentUser.total_points -= points;
-                    
-                    // 更新UI
-                    document.getElementById('hunger-value').textContent = currentPet.hunger + '%';
-                    document.getElementById('hunger-fill').style.width = currentPet.hunger + '%';
-                    
-                    // 喂养动画
-                    const beast = document.getElementById('pet-beast');
-                    beast.classList.add('feeding');
-                    setTimeout(() => beast.classList.remove('feeding'), 500);
-                    
-                    alert('✅ 喂养成功！' + currentPet.nickname + '的饱食度提升了！');
-                } else {
-                    alert('喂养失败：' + (data.error || '未知错误'));
-                }
-            } catch (e) {
-                alert('请求失败：' + e.message);
-            }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.3);
         }
-        
-        // 加载积分信息
-        async function loadPointsInfo() {
-            const userId = currentUser?.id || localStorage.getItem('userId');
-            if (!userId) {
-                document.getElementById('points-user-info').innerHTML = `
-                    <div class="message info">请先创建账号</div>
-                `;
-                return;
-            }
-            
-            try {
-                const res = await fetch(API_BASE + `/api/users/${userId}`);
-                const data = await res.json();
-                
-                if (data.success) {
-                    currentUser = data.data;
-                    document.getElementById('points-user-info').innerHTML = `
-                        <div class="stats">
-                            <div class="stat-card">
-                                <div class="stat-value">${currentUser.total_points}</div>
-                                <div class="stat-label">总积分</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">${currentUser.display_name}</div>
-                                <div class="stat-label">用户名</div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // 加载积分历史
-                    const historyRes = await fetch(API_BASE + `/api/users/${userId}/points/records`);
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        .leaderboard-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecef 100%);
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        .rank {
+            background: #667eea;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        .rank.gold { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .rank.silver { background: linear-gradient(135deg, #C0C0C0, #A0A0A0); }
+        .rank.bronze { background: linear-gradient(135deg, #CD7F32, #B8860B); }
+        .message {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 1.1em;
+        }
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
