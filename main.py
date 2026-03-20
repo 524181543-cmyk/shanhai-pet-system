@@ -286,10 +286,10 @@ INDEX_HTML = """
         </div>
         
         <div class="tabs">
-            <button class="tab active" onclick="showPanel('adopt')">🐾 领养宠物</button>
-            <button class="tab" onclick="showPanel('my-pet')">🎮 我的宠物</button>
-            <button class="tab" onclick="showPanel('points')">⭐ 积分中心</button>
-            <button class="tab" onclick="showPanel('leaderboard')">🏆 排行榜</button>
+            <button class="tab active" onclick="showPanel('adopt', this)">🐾 领养宠物</button>
+            <button class="tab" onclick="showPanel('my-pet', this)">🎮 我的宠物</button>
+            <button class="tab" onclick="showPanel('points', this)">⭐ 积分中心</button>
+            <button class="tab" onclick="showPanel('leaderboard', this)">🏆 排行榜</button>
         </div>
         
         <!-- 领养宠物 -->
@@ -374,12 +374,12 @@ INDEX_HTML = """
         let currentPet = null;
         const API_BASE = '';
         
-        // 显示面板
-        function showPanel(name) {
+        // 显示面板 - 修复：接收event参数
+        function showPanel(name, btn) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(name + '-panel').classList.add('active');
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
             
             if (name === 'leaderboard') loadLeaderboard();
             if (name === 'my-pet') loadMyPet();
@@ -477,7 +477,6 @@ INDEX_HTML = """
                 if (data.success) {
                     currentPet = data.data;
                     alert('🎉 恭喜你成功领养了' + nickname + '！');
-                    showPanel('my-pet');
                 } else {
                     alert('领养失败：' + (data.error || '未知错误'));
                 }
