@@ -5,6 +5,7 @@
 import os
 import sys
 import logging
+from datetime import datetime
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -37,6 +38,15 @@ except Exception as e:
     logger.warning(f"⚠️ 数据库连接失败: {str(e)}")
     logger.info("使用模拟数据模式...")
     db = None
+
+# ========== 模拟数据存储 ==========
+mock_db = {
+    'users': {},
+    'user_pets': {},
+    'point_records': [],
+    'next_user_id': 1,
+    'next_pet_id': 1
+}
 
 # ========== Pydantic模型 ==========
 
@@ -704,16 +714,19 @@ async def create_user(user: UserCreate):
     """创建用户"""
     if not db:
         # 模拟数据模式
-        return {
-            "success": True,
-            "data": {
-                "id": 1,
-                "username": user.username,
-                "email": user.email,
-                "display_name": user.display_name,
-                "total_points": 0
-            }
+        user_id = mock_db['next_user_id']
+        mock_db['next_user_id'] += 1
+        
+        new_user = {
+            "id": user_id,
+            "username": user.username,
+            "email": user.email,
+            "display_name": user.display_name,
+            "total_points": 0
         }
+        mock_db['users'][user_id] = new_user
+        logger.info(f"模拟模式：创建用户 {user.username}, ID: {user_id}")
+        return {"success": True, "data": new_user}
     
     try:
         # 检查用户名是否存在
@@ -739,7 +752,10 @@ async def create_user(user: UserCreate):
 async def get_user(user_id: int):
     """获取用户信息"""
     if not db:
-        return {"success": True, "data": {"id": user_id, "username": "test", "display_name": "测试用户", "total_points": 100}}
+        user = mock_db['users'].get(user_id)
+        if not user:
+            return JSONResponse(content={"success": False, "error": "用户不存在"}, status_code=404)
+        return {"success": True, "data": user}
     
     try:
         result = db.table('users').select('*').eq('id', user_id).execute()
@@ -785,19 +801,30 @@ async def get_pet_types():
 @app.post("/api/users/{user_id}/pets")
 async def adopt_pet(user_id: int, pet: PetAdopt):
     """领养宠物"""
+    # 宠物名称映射
+    pet_names = {1: '麒麟', 2: '凤凰', 3: '九尾狐', 4: '玄武', 5: '白虎', 6: '青龙'}
+    
     if not db:
-        return {
-            "success": True,
-            "data": {
-                "id": 1,
-                "user_id": user_id,
-                "pet_type_id": pet.pet_type_id,
-                "nickname": pet.nickname or "宠物",
-                "current_stage": 1,
-                "total_points": 0,
-                "pet_types": {"name": "麒麟"}
-            }
+        # 检查用户是否已有宠物
+        for p in mock_db['user_pets'].values():
+            if p['user_id'] == user_id:
+                return JSONResponse(content={"success": False, "error": "该用户已有宠物"}, status_code=400)
+        
+        pet_id = mock_db['next_pet_id']
+        mock_db['next_pet_id'] += 1
+        
+        new_pet = {
+            "id": pet_id,
+            "user_id": user_id,
+            "pet_type_id": pet.pet_type_id,
+            "nickname": pet.nickname or pet_names.get(pet.pet_type_id, '宠物'),
+            "current_stage": 1,
+            "total_points": 0,
+            "pet_types": {"name": pet_names.get(pet.pet_type_id, '未知')}
         }
+        mock_db['user_pets'][pet_id] = new_pet
+        logger.info(f"模拟模式：用户 {user_id} 领养宠物 {new_pet['nickname']}")
+        return {"success": True, "data": new_pet}
     
     try:
         # 检查是否已有宠物
@@ -830,7 +857,8 @@ async def adopt_pet(user_id: int, pet: PetAdopt):
 async def get_user_pets(user_id: int):
     """获取用户的宠物"""
     if not db:
-        return {"success": True, "data": []}
+        pets = [p for p in mock_db['user_pets'].values() if p['user_id'] == user_id]
+        return {"success": True, "data": pets}
     
     try:
         result = db.table('user_pets').select('*, pet_types(*)').eq('user_id', user_id).execute()
@@ -845,7 +873,27 @@ async def get_user_pets(user_id: int):
 async def add_points(user_id: int, point: PointAdd):
     """添加积分"""
     if not db:
-        return {"success": True, "data": {"id": 1, "points": point.points}}
+        # 创建积分记录
+        record = {
+            "id": len(mock_db['point_records']) + 1,
+            "user_id": user_id,
+            "points": point.points,
+            "reason": point.reason,
+            "category": point.category,
+            "created_at": datetime.now().isoformat()
+        }
+        mock_db['point_records'].append(record)
+        
+        # 更新用户总积分
+        if user_id in mock_db['users']:
+            mock_db['users'][user_id]['total_points'] += point.points
+        
+        # 更新宠物积分
+        if point.user_pet_id and point.user_pet_id in mock_db['user_pets']:
+            mock_db['user_pets'][point.user_pet_id]['total_points'] += point.points
+        
+        logger.info(f"模拟模式：用户 {user_id} 获得 {point.points} 积分")
+        return {"success": True, "data": record}
     
     try:
         # 创建积分记录
@@ -880,7 +928,8 @@ async def add_points(user_id: int, point: PointAdd):
 async def get_point_records(user_id: int, limit: int = 20):
     """获取积分记录"""
     if not db:
-        return {"success": True, "data": []}
+        records = [r for r in mock_db['point_records'] if r['user_id'] == user_id]
+        return {"success": True, "data": records[-limit:]}
     
     try:
         result = db.table('point_records').select('*').eq('user_id', user_id).order('created_at', desc=True).limit(limit).execute()
@@ -895,7 +944,8 @@ async def get_point_records(user_id: int, limit: int = 20):
 async def get_leaderboard(limit: int = 10):
     """获取排行榜"""
     if not db:
-        return {"success": True, "data": []}
+        users = sorted(mock_db['users'].values(), key=lambda x: x['total_points'], reverse=True)
+        return {"success": True, "data": users[:limit]}
     
     try:
         result = db.table('users').select('id, username, display_name, total_points').order('total_points', desc=True).limit(limit).execute()
