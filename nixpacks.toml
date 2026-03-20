@@ -1,8 +1,8 @@
 [phases.setup]
-nixPkgs = ['python312', 'gcc']
+nixPkgs = ['python312', 'gcc', 'libpq']
 
 [phases.install]
-cmds = ['pip install -r requirements.txt']
+cmds = ['pip install --no-cache-dir -r requirements-railway.txt']
 
 [start]
-cmd = 'python src/main.py -m http -p $PORT'
+cmd = 'python src/main.py -m http -p ${PORT:-8000}'

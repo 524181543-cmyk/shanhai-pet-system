@@ -1,0 +1,15 @@
+# 山海经宠物系统 - Railway最小化依赖
+# 核心Web框架
+fastapi>=0.121,<1
+uvicorn>=0.38,<1
+pydantic>=2.12,<3
+
+# Supabase数据库
+supabase>=2.27,<3
+httpx>=0.28,<1
+
+# 环境变量
+python-dotenv>=1.2,<2
+
+# 日志
+rich>=14,<15
